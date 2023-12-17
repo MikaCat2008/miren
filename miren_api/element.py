@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-from typing import Callable
+from ._types import DOMType, ElementType
 
-from ._types import ElementType
-
-from .styles import Styles
 from .attributes import Attributes
 from .dispatcher import Dispatcher
 
@@ -12,12 +9,14 @@ from .dispatcher import Dispatcher
 class Element(ElementType, Dispatcher):
     def __init__(
         self, 
+        dom: DOMType,
         class_list: list[str] = None,
         elements: list[ElementType] = None,
         attributes: dict[str, object] = None
     ) -> None:
         super().__init__()
 
+        self.dom = dom
         self.class_list = class_list or []
         self.elements = elements or []
         self.attributes = Attributes(attributes)
@@ -50,3 +49,15 @@ class Element(ElementType, Dispatcher):
             elements += element.get_elements_by_class(_class)
         
         return elements
+
+    def destroy(self) -> None:
+        for element in self.elements:
+            element.destroy()
+
+        print(len(self.parent.elements))
+
+        self.parent.elements.remove(self)
+
+        print(len(self.parent.elements))
+
+        self.dom.elements.remove(self)

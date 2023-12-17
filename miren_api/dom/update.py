@@ -43,7 +43,7 @@ def update(dom: DOMType, events: list[EventType]) -> None:
         if ex <= mx <= ex + ew and ey <= my <= ey + eh:
             if m1:
                 if not is_clicked:
-                    if selected_element is None and styles.selectable:
+                    if selected_element is None and styles.selectable and not dom.is_clicked:
                         selected_element = element
 
                     element.styles.is_clicked = True
@@ -58,6 +58,11 @@ def update(dom: DOMType, events: list[EventType]) -> None:
         elif is_mouse_in:
             element.styles.is_mouse_in = False
 
+    if m1 and not dom.is_clicked:
+        dom.is_clicked = True
+    elif not m1 and dom.is_clicked:
+        dom.is_clicked = False
+
     if hovered_element and hovered_element is not dom.hovered_element:
         if dom.hovered_element:
             dom.hovered_element.emit("mouse_out")
@@ -70,29 +75,21 @@ def update(dom: DOMType, events: list[EventType]) -> None:
         dom.hovered_element = hovered_element
 
     if selected_element and selected_element is not dom.selected_element:
-        if isinstance(selected_element, InputFieldContainer):
-            dom.input_text = selected_element.text
-            dom.input_index = 0
-        
-        if dom.selected_element:
-            dom.selected_element.emit("unselect")
-            dom.selected_element.styles.is_selected = False
+        dom.unselect()
 
-        selected_element.styles.is_selected = True
-
-        selected_element.emit("select")
-        selected_element.emit("click")
-
-        dom.selected_element = selected_element
+        dom.select(selected_element)
 
     for event in events:
         if event.type == pygame.KEYDOWN:
-            symbol = event.unicode
-
             if not isinstance(dom.selected_element, InputFieldContainer):
                 continue
 
-            if event.key == 1073742048:
+            symbol = event.unicode
+
+            if symbol == "\x1b":
+                dom.unselect()
+
+            elif event.key == 1073742048:
                 dom.ctrl = True
 
             elif event.key == 1073741904:
@@ -211,8 +208,10 @@ def update(dom: DOMType, events: list[EventType]) -> None:
             elif symbol == "\r":
                 if not isinstance(dom.selected_element, InputFieldContainer):
                     continue
-
+                
                 dom.selected_element.emit("submit")
+
+                dom.unselect()
 
         if event.type == pygame.KEYUP:
             if event.key == 1073742048:

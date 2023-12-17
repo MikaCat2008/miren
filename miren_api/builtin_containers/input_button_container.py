@@ -1,8 +1,8 @@
-from typing import Callable
-from ..element import Element
-# from ..dispatcher import Listener
-
 from .text_container import TextContainer
+
+from .._types import DOMType
+
+from ..element import Element
 
 
 class InputButtonContainer(Element):
@@ -11,6 +11,7 @@ class InputButtonContainer(Element):
     def __init__(
         self,
         text_container: TextContainer,
+        dom: DOMType,
         class_list: list[str] = None,
         attributes: dict[str, object] = None
     ) -> None:
@@ -29,7 +30,7 @@ class InputButtonContainer(Element):
         if "input_text_container" not in text_container.class_list:
             text_container.class_list = ["input_text_container"] + text_container.class_list
 
-        super().__init__(class_list, [text_container], attributes)
+        super().__init__(dom, class_list, [text_container], attributes)
 
         self.text = text_container.text
         self.text_container = text_container

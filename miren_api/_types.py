@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Callable
 from collections import defaultdict
 
+from pygame.event import EventType
 from pygame.surface import SurfaceType
 
 
@@ -71,6 +72,7 @@ class StylesType(ABC):
 
 
 class ElementType(DispatcherType, ABC):
+    dom: DOMType
     class_list: list[str]
     elements: list[ElementType]
     attribute: AttributesType
@@ -83,18 +85,38 @@ class ElementType(DispatcherType, ABC):
     absolute_position: tuple[int, int]
     parent: ElementType
 
+    def add_element(self, element: ElementType) -> ElementType: ...
+
+    def get_elements_by_class(self, _class: str) -> ElementType: ...
+
+    def destroy(self) -> None: ...
+
 
 class DOMType(ElementType, ABC):
     window: WindowType
     screen: SurfaceType
+    container: ElementType
 
     ctrl: bool
+    is_clicked: bool
 
     input_text: str
     input_index: int
 
     hovered_element: ElementType
     selected_element: ElementType
+
+    def add_element(self, element: ElementType, child_add = False) -> ElementType: ...
+
+    def get_elements_by_class(self, _class: str) -> ElementType: ...
+
+    def get_elements(self, element: ElementType = None) -> list[ElementType]: ...
+
+    def select(self, element: ElementType) -> None: ...
+
+    def unselect(self) -> None: ...
+
+    def update(self, events: list[EventType]) -> None: ...
 
 
 class WindowType(ABC):
