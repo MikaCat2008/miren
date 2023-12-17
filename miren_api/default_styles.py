@@ -1,6 +1,6 @@
 default_styles = {
     "input_container": {
-        # "overflow": "hidden",
+        "overflow": "hidden",
 
         "height": 40,
 
