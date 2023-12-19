@@ -26,7 +26,7 @@ def text_container(
 ) -> TextContainer:
     return TextContainer(
         text, get_dom(), class_list, attributes
-    )    
+    )
 
 
 def input_field_container(
@@ -43,8 +43,14 @@ def input_field(
     class_list: list[str] = None,
     attributes: dict[str, object] = None
 ) -> None:
+    if attributes is None:
+        attributes = {}
+
     return input_field_container(
-        text_container(), class_list, attributes
+        text_container(
+            attributes.get("value", ""),
+            attributes.get("text_class_list")
+        ), class_list, attributes
     )
 
 
@@ -55,6 +61,18 @@ def input_button_container(
 ) -> InputButtonContainer:
     return InputButtonContainer(
         text_container, get_dom(), class_list, attributes
+    )
+
+
+def input_button(
+    class_list: list[str] = None, 
+    attributes: dict[str, object] = None
+) -> InputButtonContainer:
+    return input_button_container(
+        text_container(
+            attributes.get("value", ""),
+            attributes.get("text_class_list")
+        ), class_list, attributes
     )
 
 

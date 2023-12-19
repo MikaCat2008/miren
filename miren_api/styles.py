@@ -7,7 +7,8 @@ def get_default_styles(dom: DOMType, _class: str) -> dict[str, object]:
     return dom.styles.get(_class, {})
 
 
-def get_styles(dom: DOMType, element: ElementType) -> StylesType:
+def get_styles(element: ElementType) -> StylesType:
+    dom = element.dom
     styles = Styles()
 
     for _class in element.class_list:

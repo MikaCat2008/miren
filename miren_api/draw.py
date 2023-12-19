@@ -25,12 +25,12 @@ def get_font(size: int) -> font.FontType:
 
 
 def draw_element(
-    dom: DOMType,
-    screen: SurfaceType,
     element: ElementType,
-    styles: StylesType,
+    screen: SurfaceType,
     debug: bool = False
 ) -> None:
+    dom = element.dom
+    styles = element.get_styles()
     width, height = element.size
 
     background_color = styles.background_color
@@ -51,7 +51,7 @@ def draw_element(
         rendered = _font.render(element.text, 1, color)
 
         parent = element.parent
-        overflow = get_styles(dom, element.parent).overflow
+        overflow = parent.get_styles().overflow
 
         element_x, element_y = element.position
 
@@ -92,19 +92,15 @@ def draw_element(
 
 
 def draw_layer(
-    dom: DOMType,
     screen: SurfaceType,
     layer: list[ElementType],
     debug: bool = False
 ) -> None:
     for element in layer:
-        styles = get_styles(dom, element)
-
-        draw_element(dom, screen, element, styles, debug)
+        draw_element(element, screen, debug)
 
 
 def draw_layers(
-    dom: DOMType,
     screen: SurfaceType, 
     layers: defaultdict[int, list[ElementType]],
     debug: bool = False
@@ -112,4 +108,4 @@ def draw_layers(
     sorted_layers = sorted(layers.items(), key=lambda x: x[0])
 
     for _, layer in sorted_layers:
-        draw_layer(dom, screen, layer, debug)
+        draw_layer(screen, layer, debug)

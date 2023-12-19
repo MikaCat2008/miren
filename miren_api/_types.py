@@ -91,6 +91,8 @@ class ElementType(DispatcherType, ABC):
 
     def destroy(self) -> None: ...
 
+    def get_styles(self) -> StylesType: ...
+
 
 class DOMType(ElementType, ABC):
     window: WindowType
@@ -99,6 +101,10 @@ class DOMType(ElementType, ABC):
 
     ctrl: bool
     is_clicked: bool
+
+    pressed_time: int
+    pressed_key: int
+    pressed_symbol: str 
 
     input_text: str
     input_index: int

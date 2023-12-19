@@ -14,11 +14,138 @@ from ..builtin_containers import (
 )
 
 
+def left_arrow(dom: DOMType) -> None:
+    input_text = dom.selected_element.text
+    
+    if input_text:
+        if dom.ctrl :
+            splitted = input_text[:dom.input_index].split()
+            
+            if len(splitted) < 2:
+                dom.input_index = 0
+
+            else:
+                *_, text = input_text[:dom.input_index].split()
+                right_text = input_text[dom.input_index:]
+
+                dom.input_index -= len(text)
+
+                if right_text:
+                    if right_text[0] != " ":
+                        dom.input_index -= 1
+                elif input_text[-1] == " ":
+                    dom.input_index -= 1
+
+        elif dom.input_index > 0:
+            dom.input_index -= 1
+
+
+def right_arrow(dom: DOMType) -> None:
+    input_text = dom.selected_element.text
+    
+    if input_text:
+        if dom.ctrl :
+            splitted = input_text[dom.input_index:].split()
+            
+            if len(splitted) < 2:
+                dom.input_index = len(input_text)
+
+            else:
+                text, *right_splitted_text = splitted
+                left_text = input_text[:dom.input_index]
+
+                dom.input_index += len(text)
+
+                if left_text and left_text[-1] != " ":
+                    dom.input_index += 1
+
+        elif dom.input_index < len(input_text):
+            dom.input_index += 1
+
+
+def backslash(dom: DOMType) -> None:
+    if not isinstance(dom.selected_element, InputFieldContainer):
+        return 
+    
+    if not dom.input_text:
+        return
+
+    input_text = dom.selected_element.text
+
+    if dom.ctrl:
+        splitted = input_text[:dom.input_index].split()
+        right_text = input_text[dom.input_index:]
+
+        if len(splitted) < 2:
+            text = right_text
+
+            dom.input_index = 0
+            
+        else:
+            *left_splitted_text, text = splitted
+            
+            dom.input_index -= len(text)
+
+            if right_text:
+                if right_text[0] != " ":
+                    dom.input_index -= 1
+            elif input_text[-1] == " ":
+                dom.input_index -= 1
+
+            text = " ".join(left_splitted_text) + " " + right_text
+
+    elif dom.input_index > 0:
+        text = input_text[:dom.input_index - 1] + input_text[dom.input_index:]
+
+        dom.input_index -= 1
+
+    else:
+        text = input_text
+
+    dom.input_text = text
+    
+    dom.selected_element.set_text(text)
+    dom.selected_element.emit("input")
+
+
+
+def delete(dom: DOMType) -> None:
+    if not isinstance(dom.selected_element, InputFieldContainer):
+        return
+
+    if not dom.input_text:
+        return
+    
+    input_text = dom.selected_element.text
+
+    if dom.ctrl:
+        splitted = input_text[dom.input_index:].split()
+        left_text = input_text[:dom.input_index]
+
+        if len(splitted) < 2:
+            text = left_text
+
+        else:
+            text, *right_splitted_text = splitted
+            left_text = input_text[:dom.input_index]
+
+            text = left_text + " " + " ".join(right_splitted_text)
+
+    else:
+        text = input_text[:dom.input_index] + input_text[dom.input_index + 1:]
+
+    dom.input_text = text
+    
+    dom.selected_element.set_text(text)
+    dom.selected_element.emit("input")
+
+
+
 def update(dom: DOMType, events: list[EventType]) -> None:
     layers = defaultdict(list[int])
 
-    update_element(dom, dom.container, layers)
-    draw_layers(dom, dom.screen, layers, dom.window.debug)
+    update_element(dom.container, layers)
+    draw_layers(dom.screen, layers, dom.window.debug)
 
     mx, my = mouse.get_pos()
     m1, m2, m3 = mouse.get_pressed()
@@ -29,7 +156,7 @@ def update(dom: DOMType, events: list[EventType]) -> None:
     elements = dom.get_elements()
 
     for element in elements:
-        styles = get_styles(dom, element)
+        styles = element.get_styles()
 
         if isinstance(element, SurfaceContainer):
             element.emit("update")
@@ -93,117 +220,16 @@ def update(dom: DOMType, events: list[EventType]) -> None:
                 dom.ctrl = True
 
             elif event.key == 1073741904:
-                input_text = dom.selected_element.text
-                
-                if input_text:
-                    if dom.ctrl :
-                        splitted = input_text[:dom.input_index].split()
-                        
-                        if len(splitted) < 2:
-                            dom.input_index = 0
-
-                        else:
-                            *_, text = input_text[:dom.input_index].split()
-                            right_text = input_text[dom.input_index:]
-
-                            dom.input_index -= len(text)
-
-                            if right_text:
-                                if right_text[0] != " ":
-                                    dom.input_index -= 1
-                            elif input_text[-1] == " ":
-                                dom.input_index -= 1
-
-                    elif dom.input_index > 0:
-                        dom.input_index -= 1
+                left_arrow(dom)
 
             elif event.key == 1073741903:
-                input_text = dom.selected_element.text
-                
-                if input_text:
-                    if dom.ctrl :
-                        splitted = input_text[dom.input_index:].split()
-                        
-                        if len(splitted) < 2:
-                            dom.input_index = len(input_text)
-
-                        else:
-                            text, *right_splitted_text = splitted
-                            left_text = input_text[:dom.input_index]
-
-                            dom.input_index += len(text)
-
-                            if left_text and left_text[-1] != " ":
-                                dom.input_index += 1
-
-                    elif dom.input_index < len(input_text):
-                        dom.input_index += 1
+                right_arrow(dom)
 
             elif symbol == "\x08":
-                if isinstance(dom.selected_element, InputFieldContainer):
-                    if dom.input_text:
-                        input_text = dom.selected_element.text
-
-                        if dom.ctrl:
-                            splitted = input_text[:dom.input_index].split()
-                            right_text = input_text[dom.input_index:]
-
-                            if len(splitted) < 2:
-                                text = right_text
-
-                                dom.input_index = 0
-                                
-                            else:
-                                *left_splitted_text, text = splitted
-                                
-                                dom.input_index -= len(text)
-
-                                if right_text:
-                                    if right_text[0] != " ":
-                                        dom.input_index -= 1
-                                elif input_text[-1] == " ":
-                                    dom.input_index -= 1
-
-                                text = " ".join(left_splitted_text) + " " + right_text
-
-                        elif dom.input_index > 0:
-                            text = input_text[:dom.input_index - 1] + input_text[dom.input_index:]
-
-                            dom.input_index -= 1
-
-                        else:
-                            text = input_text
-
-                        dom.input_text = text
-                        
-                        dom.selected_element.set_text(text)
-                        dom.selected_element.emit("input")
+                backslash(dom)
 
             elif symbol == "\x7f":
-                if isinstance(dom.selected_element, InputFieldContainer):
-                    if dom.input_text:
-                        input_text = dom.selected_element.text
-
-                        if dom.ctrl:
-                            splitted = input_text[dom.input_index:].split()
-                            left_text = input_text[:dom.input_index]
-
-                            if len(splitted) < 2:
-                                text = left_text
-
-                            else:
-                                text, *right_splitted_text = splitted
-                                left_text = input_text[:dom.input_index]
-
-                                text = left_text + " " + " ".join(right_splitted_text)
-
-                        else:
-                            text = input_text[:dom.input_index] + input_text[dom.input_index + 1:]
-
-                        dom.input_text = text
-                        
-                        dom.selected_element.set_text(text)
-                        dom.selected_element.emit("input")
+                delete(dom)
 
             elif symbol == "\r":
                 if not isinstance(dom.selected_element, InputFieldContainer):
@@ -213,9 +239,19 @@ def update(dom: DOMType, events: list[EventType]) -> None:
 
                 dom.unselect()
 
+            dom.pressed_time = 0
+            dom.pressed_key = event.key
+            dom.pressed_symbol = symbol
+
         if event.type == pygame.KEYUP:
             if event.key == 1073742048:
                 dom.ctrl = False
+
+            if (event.key == dom.pressed_key and dom.pressed_key) or \
+                (event.unicode == dom.pressed_symbol and dom.pressed_symbol):
+                dom.pressed_time = None
+                dom.pressed_key = None
+                dom.pressed_symbol = None
 
         if event.type == pygame.TEXTINPUT:
             symbol = event.text
@@ -231,3 +267,23 @@ def update(dom: DOMType, events: list[EventType]) -> None:
 
             dom.selected_element.set_text(text)
             dom.selected_element.emit("input")
+
+    if dom.pressed_symbol or dom.pressed_key:
+        dom.pressed_time += 1
+
+        if max(1, dom.pressed_time - 1300) % 120 == 0:
+            if isinstance(dom.selected_element, InputFieldContainer):
+                key = dom.pressed_key
+                symbol = dom.pressed_symbol
+
+                if key == 1073741904:
+                    left_arrow(dom)
+
+                elif key == 1073741903:
+                    right_arrow(dom)
+
+                elif symbol == "\x08":
+                    backslash(dom)
+
+                elif symbol == "\x7f":
+                    delete(dom)

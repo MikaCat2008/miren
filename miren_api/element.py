@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from ._types import DOMType, ElementType
+from ._types import DOMType, ElementType, StylesType
 
+from .styles import get_styles as _get_styles
 from .attributes import Attributes
 from .dispatcher import Dispatcher
 
@@ -54,10 +55,8 @@ class Element(ElementType, Dispatcher):
         for element in self.elements:
             element.destroy()
 
-        print(len(self.parent.elements))
-
         self.parent.elements.remove(self)
-
-        print(len(self.parent.elements))
-
         self.dom.elements.remove(self)
+
+    def get_styles(self) -> StylesType:
+        return _get_styles(self)

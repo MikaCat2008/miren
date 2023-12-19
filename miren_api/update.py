@@ -2,8 +2,6 @@ from collections import defaultdict
 
 from ._types import DOMType, ElementType
 
-from .styles import get_styles
-
 
 def update_xy(
     position: str, display: str,
@@ -26,17 +24,17 @@ def update_xy(
 
 
 def update_element(
-    dom: DOMType,
     element: ElementType,
     layers: defaultdict[int, list[ElementType]],
     max_position: tuple[int, int] = (0, 0),
     parent_display: str = "y"
 ) -> tuple[int, int]:
+    dom = element.dom
     x, y = element.position
     max_x, max_y = max_position
 
     for child_element in element.elements:
-        styles = get_styles(dom, child_element)
+        styles = child_element.get_styles()
 
         display = styles.display
         position_type = styles.position
@@ -56,7 +54,6 @@ def update_element(
         layers[styles.z_index].append(child_element)
 
         child_max_x, child_max_y = update_element(
-            dom, 
             child_element,
             layers, 
             (0, 0), 

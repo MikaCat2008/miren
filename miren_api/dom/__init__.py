@@ -32,8 +32,12 @@ class DOM(DOMType, Element):
 
         self.ctrl = False
         self.is_clicked = False
+
+        self.pressed_time = None
+        self.pressed_key = None
+        self.pressed_symbol = None
         
-        self.input_text = ""
+        self.input_text = None
         self.input_index = 0
 
         self.hovered_element = None
@@ -86,7 +90,7 @@ class DOM(DOMType, Element):
         self.selected_element = element
 
     def unselect(self) -> None:
-        self.input_text = ""
+        self.input_text = None
         self.input_index = 0
 
         selected_element = self.selected_element
