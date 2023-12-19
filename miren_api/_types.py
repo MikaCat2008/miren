@@ -102,6 +102,9 @@ class DOMType(ElementType, ABC):
     ctrl: bool
     is_clicked: bool
 
+    input_line_time: int
+    is_input_line_show: bool
+
     pressed_time: int
     pressed_key: int
     pressed_symbol: str 

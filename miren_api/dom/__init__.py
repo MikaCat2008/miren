@@ -33,6 +33,9 @@ class DOM(DOMType, Element):
         self.ctrl = False
         self.is_clicked = False
 
+        self.input_line_time = None 
+        self.is_input_line_show = False
+
         self.pressed_time = None
         self.pressed_key = None
         self.pressed_symbol = None
@@ -82,6 +85,9 @@ class DOM(DOMType, Element):
             self.input_text = element.text
             self.input_index = 0
 
+            self.input_line_time = 0
+            self.is_input_line_show = True
+
         element.styles.is_selected = True
 
         element.emit("select")
@@ -92,6 +98,9 @@ class DOM(DOMType, Element):
     def unselect(self) -> None:
         self.input_text = None
         self.input_index = 0
+
+        self.input_line_time = 0
+        self.is_input_line_show = None
 
         selected_element = self.selected_element
 

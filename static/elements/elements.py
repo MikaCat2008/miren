@@ -10,5 +10,7 @@ def start(dom: api.DOMType) -> None:
 
 def get_elements() -> list[api.ElementType]:
     return [
+        input_field(),
+        input_field(),
         input_field()
     ]

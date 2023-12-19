@@ -44,12 +44,14 @@ default_styles = {
         "width": 200,
         "height": 40,
 
-        "margin_left": 5
+        "margin_left": 5,
+        "margin_right": 9
     },
     "input_button_text_container": {
         "width": 40,
         "height": 40,
 
-        "margin_left": 5
+        "margin_left": 5,
+        "margin_right": 9
     }
 }

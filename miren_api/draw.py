@@ -55,30 +55,32 @@ def draw_element(
 
         element_x, element_y = element.position
 
+        input_rendered = _font.render(element.text[:dom.input_index], 1, color)
+        line_x, _ = input_rendered.get_size()  
+
         if overflow == "normal":
             screen.blit(rendered, element.position)
         
         elif overflow == "hidden":
+            element_width, element_height = element.size
             parent_width, parent_height = parent.size
             parent_x, parent_y = parent.position
+
+            width = min(parent_width, element_width)
 
             screen.blit(
                 rendered, 
                 (element_x, element_y), 
-                (0, 0, parent_width - element_x + parent_x, parent_height - element_y + parent_y)
-            )
-        
+                (max(0, line_x - width + styles.margin_right), 0, width - element_x + parent_x, parent_height - element_y + parent_y)
+            ) 
 
-        if isinstance(parent, InputFieldContainer) and parent.styles.is_selected:
-            input_rendered = _font.render(element.text[:dom.input_index], 1, color)
-            input_rendered_x, _ = input_rendered.get_size()
-
+        if dom.is_input_line_show and isinstance(parent, InputFieldContainer) and parent.styles.is_selected:
             draw.line(
                 screen, 
                 (0, 0, 0), 
-                (element_x + input_rendered_x, element_y), 
-                (element_x + input_rendered_x, element_y + font_size)
-            )    
+                (element_x - max(0, line_x - width + styles.margin_right) + line_x, element_y), 
+                (element_x - max(0, line_x - width + styles.margin_right) + line_x, element_y + font_size)
+            )
 
 
     elif isinstance(element, SurfaceContainer):

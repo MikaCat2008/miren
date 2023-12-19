@@ -268,10 +268,12 @@ def update(dom: DOMType, events: list[EventType]) -> None:
             dom.selected_element.set_text(text)
             dom.selected_element.emit("input")
 
+            dom.is_input_line_show = True
+
     if dom.pressed_symbol or dom.pressed_key:
         dom.pressed_time += 1
 
-        if max(1, dom.pressed_time - 1300) % 120 == 0:
+        if max(1, dom.pressed_time - 1100) % 120 == 0:
             if isinstance(dom.selected_element, InputFieldContainer):
                 key = dom.pressed_key
                 symbol = dom.pressed_symbol
@@ -287,3 +289,11 @@ def update(dom: DOMType, events: list[EventType]) -> None:
 
                 elif symbol == "\x7f":
                     delete(dom)
+
+                dom.is_input_line_show = True
+
+    if dom.input_text is not None:
+        dom.input_line_time += 1
+
+        if dom.input_line_time % 1600 == 0:
+            dom.is_input_line_show = not dom.is_input_line_show
