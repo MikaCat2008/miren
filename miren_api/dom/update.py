@@ -201,13 +201,27 @@ def update(dom: DOMType, events: list[EventType]) -> None:
 
         dom.hovered_element = hovered_element
 
-    if selected_element and selected_element is not dom.selected_element:
-        dom.unselect()
+    if selected_element:
+        if selected_element is not dom.selected_element:
+            dom.unselect()
 
-        dom.select(selected_element)
+            dom.select(selected_element)
+
+        ex, ey = selected_element.position
+
+        selected_element.emit("click", **{
+            "mx": mx,
+            "my": my,
+            "ex": mx - ex,
+            "ey": my - ey
+        })
 
     for event in events:
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.VIDEORESIZE:
+            dom.window.screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+            dom.screen = dom.window.screen
+
+        elif event.type == pygame.KEYDOWN:
             if not isinstance(dom.selected_element, InputFieldContainer):
                 continue
 

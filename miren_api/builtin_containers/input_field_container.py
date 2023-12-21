@@ -1,8 +1,12 @@
+import pygame
+from pygame import mouse
+
 from .text_container import TextContainer
 
 from .._types import DOMType
 
 from ..element import Element
+from ..dispatcher import Listener
 
 
 class InputFieldContainer(Element):
@@ -39,6 +43,14 @@ class InputFieldContainer(Element):
         self.text = text
 
         self.text_container.text = text
+
+    @Listener
+    def mouse_in(self, **data: dict[str, object]) -> None:
+        mouse.set_cursor(pygame.SYSTEM_CURSOR_IBEAM)
+
+    @Listener
+    def mouse_out(self, **data: dict[str: object]) -> None:
+        mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
     @property
     def value(self) -> str:

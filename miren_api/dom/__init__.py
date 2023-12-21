@@ -91,7 +91,6 @@ class DOM(DOMType, Element):
         element.styles.is_selected = True
 
         element.emit("select")
-        element.emit("click")
 
         self.selected_element = element
 

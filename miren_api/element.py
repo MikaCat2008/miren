@@ -24,7 +24,10 @@ class Element(ElementType, Dispatcher):
 
         self.styles = self.attributes.styles
 
-        for event, listeners in (self.static_listeners | (self.attributes.listeners or {})).items():
+        for event, listener in self.static_listeners.items():
+            self.attributes.listeners[event].append(listener)
+
+        for event, listeners in self.attributes.listeners.items():
             for listener in listeners:
                 self.add_listener(event, listener)
 

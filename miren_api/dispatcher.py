@@ -22,8 +22,8 @@ class Dispatcher(DispatcherType):
     def add_listener(self, event: str, listener: Callable) -> None:
         self.listeners[event].append(listener)
 
-    def emit(self, event: str) -> None:
+    def emit(self, event: str, **data: dict[str, object]) -> None:
         listeners = self.listeners[event]
 
         for listener in listeners:
-            listener(self)
+            listener(self, **data)
